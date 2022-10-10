@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 describe("GET /api/categories", () => {
-  it("status:200, responds with an array of categories", () => {
+  it("status: 200, responds with an array of categories", () => {
     return request(app)
       .get("/api/categories")
       .expect(200)
@@ -53,8 +53,51 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/reviews/:review_id", () => {
+  it("status: 200, responds with a review object", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body: { review } }) => {
+        expect(review).toBeInstanceOf(Object);
+        expect(review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            title: "Jenga",
+            designer: "Leslie Scott",
+            owner: "philippaclaire9",
+            review_img_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            review_body: "Fiddly fun for all the family",
+            category: "dexterity",
+            created_at: expect.any(String),
+            votes: 5,
+          })
+        );
+      });
+  });
+
+  it("status: 400, Bad Request", () => {
+    return request(app)
+      .get("/api/reviews/bananas")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 404, Not Found", () => {
+    return request(app)
+      .get("/api/reviews/99999")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});
+
 describe("Errors", () => {
-  it("status:404, Not Found", () => {
+  it("status: 404, Not Found", () => {
     return request(app)
       .get("/api/bananas")
       .expect(404)
