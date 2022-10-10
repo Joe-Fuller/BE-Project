@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getCategories,
+  getUsers,
   getReviewById,
 } = require("./controllers/games.controllers");
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
+app.get("/api/users", getUsers);
 app.get("/api/reviews/:review_id", getReviewById);
 
 app.all("/*", (req, res) => {
