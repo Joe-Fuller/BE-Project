@@ -170,6 +170,34 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
 });
 
+describe.only("GET /api/reviews", () => {
+  it("status: 200, responds with an array of reviews", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeInstanceOf(Array);
+        expect(reviews).toHaveLength(13);
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              //comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+});
+
 describe("Errors", () => {
   it("status: 404, Not Found", () => {
     return request(app)

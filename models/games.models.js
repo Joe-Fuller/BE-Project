@@ -37,3 +37,16 @@ exports.updateVotes = (review_id, votes) => {
       });
   }
 };
+
+exports.selectReviews = () => {
+  return db
+    .query(
+      `
+    SELECT * FROM reviews
+    ORDER BY created_at DESC
+    `
+    )
+    .then(({ rows: reviews }) => {
+      return reviews;
+    });
+};
