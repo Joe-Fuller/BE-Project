@@ -72,6 +72,7 @@ describe("GET /api/reviews/:review_id", () => {
             category: "dexterity",
             created_at: expect.any(String),
             votes: 5,
+            comment_count: "3",
           })
         );
       });
