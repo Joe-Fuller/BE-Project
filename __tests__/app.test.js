@@ -96,6 +96,80 @@ describe("GET /api/reviews/:review_id", () => {
   });
 });
 
+describe("PATCH /api/reviews/:review_id", () => {
+  it("status: 200, updates the votes on specified review and returns review", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then(({ body: { review } }) => {
+        expect(review).toEqual({
+          review_id: 1,
+          title: "Agricola",
+          designer: "Uwe Rosenberg",
+          owner: "mallionaire",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          review_body: "Farmyard fun!",
+          category: "euro game",
+          created_at: expect.any(String),
+          votes: 11,
+        });
+      });
+  });
+
+  it("status: 400, Bad Request when no inc_votes on body", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 400, Bad Request when invalid inc_votes value", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: "cat" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 400, Bad Request when invalid inc_votes value", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: "cat" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 200, ignores extra keys on body", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: 10, something_else: "aaaahhh" })
+      .expect(200)
+      .then(({ body: { review } }) => {
+        expect(review).toEqual({
+          review_id: 1,
+          title: "Agricola",
+          designer: "Uwe Rosenberg",
+          owner: "mallionaire",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          review_body: "Farmyard fun!",
+          category: "euro game",
+          created_at: expect.any(String),
+          votes: 11,
+        });
+      });
+  });
+});
+
 describe("Errors", () => {
   it("status: 404, Not Found", () => {
     return request(app)

@@ -22,3 +22,18 @@ exports.selectReviewById = (review_id) => {
       }
     });
 };
+
+exports.updateVotes = (review_id, votes) => {
+  if (!votes) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  } else {
+    return db
+      .query(
+        `UPDATE reviews SET votes=votes+$1 WHERE review_id=$2 RETURNING *`,
+        [votes, review_id]
+      )
+      .then(({ rows: [review] }) => {
+        return review;
+      });
+  }
+};

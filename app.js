@@ -4,6 +4,7 @@ const {
   getCategories,
   getUsers,
   getReviewById,
+  patchVotes,
 } = require("./controllers/games.controllers");
 
 const app = express();
@@ -13,6 +14,8 @@ app.get("/api/categories", getCategories);
 
 app.get("/api/users", getUsers);
 app.get("/api/reviews/:review_id", getReviewById);
+
+app.patch("/api/reviews/:review_id", patchVotes);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });
