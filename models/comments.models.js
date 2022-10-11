@@ -3,7 +3,8 @@ const db = require("../db/connection");
 exports.selectCommentsByReviewId = (review_id) => {
   return db
     .query(
-      `SELECT comments.*
+      `
+    SELECT comments.*
     FROM reviews
     JOIN comments
     ON reviews.review_id = comments.review_id
