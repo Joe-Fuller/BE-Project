@@ -18,3 +18,7 @@ exports.selectCommentsByReviewId = (review_id) => {
       return comments;
     });
 };
+
+exports.insertCommentByReviewId = (review_id) => {
+  //return db.query
+};
