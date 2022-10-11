@@ -12,6 +12,9 @@ exports.selectCommentsByReviewId = (review_id) => {
       [review_id]
     )
     .then(({ rows: comments }) => {
+      if (comments.length === 0) {
+        return Promise.reject({ status: 404, msg: "Comments Not Found" });
+      }
       return comments;
     });
 };

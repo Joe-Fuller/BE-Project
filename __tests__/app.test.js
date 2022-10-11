@@ -218,21 +218,21 @@ describe("GET /api/reviews", () => {
       });
   });
 
-  it("status: 404, rejects invalid categories", () => {
-    return request(app)
-      .get("/api/reviews?category=bananas")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Category Not Found");
-      });
-  });
-
   it("status: 400, category exists but has no reviews", () => {
     return request(app)
       .get("/api/reviews?category=children's games")
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("No Reviews In That Category");
+      });
+  });
+
+  it("status: 404, rejects invalid categories", () => {
+    return request(app)
+      .get("/api/reviews?category=bananas")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Category Not Found");
       });
   });
 });
@@ -266,6 +266,24 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(200)
       .then(({ body: { comments } }) => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  it("status: 400, invalid review_id", () => {
+    return request(app)
+      .get("/api/reviews/bananas/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 404, review_id not found", () => {
+    return request(app)
+      .get("/api/reviews/9999/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comments Not Found");
       });
   });
 });
