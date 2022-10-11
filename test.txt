@@ -1,7 +1,0 @@
-You are now connected to database "nc_games_test" as user "joe".
- comment_id | body | review_id |   author   | votes |         created_at         
-------------+------+-----------+------------+-------+----------------------------
-          9 | aaa  |         3 | bainesface |     0 | 2022-10-11 15:44:32.376579
-(1 row)
-
-INSERT 0 1
