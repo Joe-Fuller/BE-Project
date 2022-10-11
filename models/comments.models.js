@@ -1,4 +1,3 @@
-const { selectReviewById } = require("../models/reviews.models");
 const db = require("../db/connection");
 const { selectReviewById } = require("./reviews.models");
 
