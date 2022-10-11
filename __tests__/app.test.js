@@ -293,17 +293,18 @@ describe("POST /api/reviews/:review_id/comments", () => {
     return request(app)
       .post("/api/reviews/2/comments")
       .send({
-        username: "DanDanGeologyMan",
+        username: "bainesface",
         body: "it's not geology but it rocks",
       })
       .expect(201)
       .then(({ body: { comment } }) => {
         expect(comment).toEqual({
-          author: "DanDanGeologyMan",
+          author: "bainesface",
           body: "it's not geology but it rocks",
           votes: 0,
           review_id: expect.any(Number),
           created_at: expect.any(String),
+          comment_id: expect.any(Number),
         });
       });
   });
@@ -318,13 +319,23 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 
+  it("status: 400, missing required fields on body", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
   it("status: 404, review_id not found", () => {
     return request(app)
       .post("/api/reviews/9999/comments")
-      .send({})
+      .send({ body: "waa", username: "wahoo" })
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Review Id Not Found");
+        expect(msg).toBe("Not Found");
       });
   });
 });
