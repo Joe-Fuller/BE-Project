@@ -6,7 +6,7 @@ exports.selectReviewById = (review_id) => {
       `
         SELECT reviews.*, COUNT(reviews.review_id) AS comment_count
         FROM reviews 
-        JOIN comments 
+        LEFT JOIN comments 
         ON reviews.review_id = comments.review_id
         WHERE reviews.review_id=$1
         GROUP BY reviews.review_id

@@ -260,6 +260,15 @@ describe("GET /api/reviews/:review_id/comments", () => {
       });
   });
 
+  it("status: 200, review has no comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No Comments Found For This Review");
+      });
+  });
+
   it("comments are sorted by most recent first", () => {
     return request(app)
       .get("/api/reviews/2/comments")
@@ -283,7 +292,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/9999/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Comments Not Found");
+        expect(msg).toBe("Not Found");
       });
   });
 });
