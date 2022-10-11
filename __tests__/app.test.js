@@ -297,6 +297,58 @@ describe("GET /api/reviews/:review_id/comments", () => {
   });
 });
 
+describe("POST /api/reviews/:review_id/comments", () => {
+  it("status: 201, posts a new comment and returns it", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "bainesface",
+        body: "it's not geology but it rocks",
+      })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toEqual({
+          author: "bainesface",
+          body: "it's not geology but it rocks",
+          votes: 0,
+          review_id: expect.any(Number),
+          created_at: expect.any(String),
+          comment_id: expect.any(Number),
+        });
+      });
+  });
+
+  it("status: 400, invalid review_id", () => {
+    return request(app)
+      .post("/api/reviews/bananas/comments")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 400, missing required fields on body", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 404, review_id not found", () => {
+    return request(app)
+      .post("/api/reviews/9999/comments")
+      .send({ body: "waa", username: "wahoo" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});
+
 describe("Errors", () => {
   it("status: 404, Not Found", () => {
     return request(app)
