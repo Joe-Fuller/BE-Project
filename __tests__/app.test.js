@@ -178,7 +178,6 @@ describe.only("GET /api/reviews", () => {
       .then(({ body: { reviews } }) => {
         expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(13);
-        expect(reviews).toBeSortedBy("created_at", { descending: true });
         reviews.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
@@ -190,9 +189,30 @@ describe.only("GET /api/reviews", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               designer: expect.any(String),
-              //comment_count: expect.any(Number),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
+        });
+      });
+  });
+
+  it("sorted by 'created_at' in descending order by default", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  it("accepts optional 'category' query, filtering results to only results with the specified category", () => {
+    return request(app)
+      .get("/api/reviews?category=euro_game")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        reviews.forEach((review) => {
+          expect(review.category).toBe("euro game");
         });
       });
   });
