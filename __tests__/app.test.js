@@ -170,7 +170,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
 });
 
-describe.only("GET /api/reviews", () => {
+describe("GET /api/reviews", () => {
   it("status: 200, responds with an array of reviews", () => {
     return request(app)
       .get("/api/reviews")
@@ -208,12 +208,30 @@ describe.only("GET /api/reviews", () => {
 
   it("accepts optional 'category' query, filtering results to only results with the specified category", () => {
     return request(app)
-      .get("/api/reviews?category=euro_game")
+      .get("/api/reviews?category=euro game")
       .expect(200)
       .then(({ body: { reviews } }) => {
         reviews.forEach((review) => {
           expect(review.category).toBe("euro game");
         });
+      });
+  });
+
+  it("status: 404, rejects invalid categories", () => {
+    return request(app)
+      .get("/api/reviews?category=bananas")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Category Not Found");
+      });
+  });
+
+  it("status: 400, category exists but has no reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No Reviews In That Category");
       });
   });
 });
