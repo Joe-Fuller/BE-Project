@@ -171,6 +171,123 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
 });
 
+describe("GET /api/reviews", () => {
+  it("status: 200, responds with an array of reviews", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeInstanceOf(Array);
+        expect(reviews).toHaveLength(13);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              review_body: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+
+  it("sorted by 'created_at' in descending order by default", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  it("accepts optional 'category' query, filtering results to only results with the specified category", () => {
+    return request(app)
+      .get("/api/reviews?category=euro game")
+      .expect(200)
+      .then(({ body: { reviews } }) => {
+        reviews.forEach((review) => {
+          expect(review.category).toBe("euro game");
+        });
+      });
+  });
+
+  it("status: 400, category exists but has no reviews", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("No Reviews In That Category");
+      });
+  });
+
+  it("status: 404, rejects invalid categories", () => {
+    return request(app)
+      .get("/api/reviews?category=bananas")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Category Not Found");
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  it("status: 200, responds with an array of comments for the given review id", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(3);
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+
+  it("comments are sorted by most recent first", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  it("status: 400, invalid review_id", () => {
+    return request(app)
+      .get("/api/reviews/bananas/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  it("status: 404, review_id not found", () => {
+    return request(app)
+      .get("/api/reviews/9999/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comments Not Found");
+      });
+  });
+});
+
 describe("Errors", () => {
   it("status: 404, Not Found", () => {
     return request(app)
