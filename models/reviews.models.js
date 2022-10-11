@@ -1,27 +1,16 @@
 const db = require("../db/connection");
 
-exports.selectCategories = () => {
-  return db.query(`SELECT * FROM categories`).then(({ rows: categories }) => {
-    return categories;
-  });
-};
-
-exports.selectUsers = () => {
-  return db.query(`SELECT * FROM users`).then(({ rows: users }) => {
-    return users;
-  });
-};
 exports.selectReviewById = (review_id) => {
   return db
     .query(
       `
-      SELECT reviews.*, COUNT(reviews.review_id) AS comment_count
-      FROM reviews 
-      JOIN comments 
-      ON reviews.review_id = comments.review_id
-      WHERE reviews.review_id=$1
-      GROUP BY reviews.review_id
-`,
+        SELECT reviews.*, COUNT(reviews.review_id) AS comment_count
+        FROM reviews 
+        JOIN comments 
+        ON reviews.review_id = comments.review_id
+        WHERE reviews.review_id=$1
+        GROUP BY reviews.review_id
+  `,
       [review_id]
     )
     .then(({ rows: [review] }) => {

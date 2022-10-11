@@ -1,4 +1,4 @@
-const { selectReviewById, updateVotes } = require("../models/games.models");
+const { selectReviewById, updateVotes } = require("../models/reviews.models");
 
 exports.getReviewById = (req, res, next) => {
   const review_id = req.params.review_id;
