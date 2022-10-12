@@ -70,3 +70,18 @@ exports.insertCommentByReviewId = (body, author, review_id) => {
       return Promise.reject({ status: err.status, msg: err.msg });
     });
 };
+
+exports.removeComment = (comment_id) => {
+  if (!comment_id) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id])
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Comment Not Found" });
+      }
+      return;
+    });
+};

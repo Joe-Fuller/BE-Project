@@ -394,7 +394,7 @@ describe("DELETE /api/comments/:comment_id", () => {
         .delete("/api/comments/999999")
         .expect(404)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("Not Found");
+          expect(msg).toBe("Comment Not Found");
         });
     });
   });
