@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data");
+const { sort } = require("../db/data/test-data/categories");
 const seed = require("../db/seeds/seed");
 
 afterAll(() => {
@@ -219,13 +220,43 @@ describe("GET /api/reviews", () => {
         });
     });
 
-    it("accepts optional 'category' query, filtering results to only results with the specified category", () => {
+    it("accepts query 'category', filtering results to only results with the specified category", () => {
       return request(app)
         .get("/api/reviews?category=euro game")
         .expect(200)
         .then(({ body: { reviews } }) => {
           reviews.forEach((review) => {
             expect(review.category).toBe("euro game");
+          });
+        });
+    });
+
+    it("accepts query 'sort_by', sorting by any valid column (defaulting to date)", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=owner")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toBeSortedBy("owner", { descending: true });
+        });
+    });
+
+    it("accepts query 'order', ordering in asc or desc (defaulting to desc)", () => {
+      return request(app)
+        .get("/api/reviews?order=asc")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
+
+    it("handles several queries at once", () => {
+      return request(app)
+        .get("/api/reviews?category=social deduction&sort_by=title&order=asc")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toBeSortedBy("title", { ascending: true });
+          reviews.forEach((review) => {
+            expect(review.category).toBe("social deduction");
           });
         });
     });
@@ -241,12 +272,30 @@ describe("GET /api/reviews", () => {
         });
     });
 
-    it("status: 404, rejects invalid categories", () => {
+    it("status: 404, rejects invalid category", () => {
       return request(app)
         .get("/api/reviews?category=bananas")
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Category Not Found");
+        });
+    });
+
+    it("status: 404, rejects invalid sort_by", () => {
+      return request(app)
+        .get("/api/reviews?sort_by=bananas")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Column Not Found");
+        });
+    });
+
+    it("status: 400, rejects invalid order", () => {
+      return request(app)
+        .get("/api/reviews?order=bananas")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Order must be 'asc' or 'desc'");
         });
     });
   });
