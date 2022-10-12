@@ -372,6 +372,34 @@ describe("POST /api/reviews/:review_id/comments", () => {
   });
 });
 
+describe("DELETE /api/comments/:comment_id", () => {
+  describe("Functionality", () => {
+    it("status: 204", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("status: 400, invalid comment_id", () => {
+      return request(app)
+        .delete("/api/comments/bananas")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+
+    it("status: 404, comment_id not found", () => {
+      return request(app)
+        .delete("/api/comments/999999")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Not Found");
+        });
+    });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
