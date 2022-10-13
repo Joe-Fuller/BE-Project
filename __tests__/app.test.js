@@ -249,6 +249,24 @@ describe("GET /api/reviews", () => {
           });
         });
     });
+
+    it("accepts query 'limit', which limits the number of responses (defaulting to 10)", () => {
+      return request(app)
+        .get("/api/reviews?limit=5")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toHaveLength(5);
+        });
+    });
+
+    it("accepts query 'p', which determines page number to start at (defaulting to 1)", () => {
+      return request(app)
+        .get("/api/reviews?p=3")
+        .expect(200)
+        .then(({ body: { reviews } }) => {
+          expect(reviews).toHaveLength(3);
+        });
+    });
   });
 
   describe("Error Handling", () => {
