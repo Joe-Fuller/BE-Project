@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data");
-const { sort } = require("../db/data/test-data/categories");
 const seed = require("../db/seeds/seed");
 
 afterAll(() => {
