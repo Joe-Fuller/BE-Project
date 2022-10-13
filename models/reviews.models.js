@@ -208,3 +208,18 @@ exports.selectReviews = (queries) => {
     return { reviews: res[0], total_count: res[1] };
   });
 };
+
+exports.removeReview = (review_id) => {
+  if (!review_id) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  return db
+    .query(`DELETE FROM reviews WHERE review_id = $1`, [review_id])
+    .then((response) => {
+      if (response.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Review Not Found" });
+      }
+      return;
+    });
+};

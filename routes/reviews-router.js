@@ -9,10 +9,15 @@ const {
   patchVotes,
   getReviews,
   postReview,
+  deleteReview,
 } = require("../controllers/reviews.controllers");
 
 reviewRouter.route("/").get(getReviews).post(postReview);
-reviewRouter.route("/:review_id").get(getReviewById).patch(patchVotes);
+reviewRouter
+  .route("/:review_id")
+  .get(getReviewById)
+  .patch(patchVotes)
+  .delete(deleteReview);
 
 reviewRouter
   .route("/:review_id/comments")
