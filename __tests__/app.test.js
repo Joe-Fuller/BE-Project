@@ -738,6 +738,34 @@ describe("POST /api/categories", () => {
   });
 });
 
+describe("DELETE /api/reviews/:review_id", () => {
+  describe("Functionality", () => {
+    it("status: 204", () => {
+      return request(app).delete("/api/reviews/1").expect(204);
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("status: 400, invalid review_id", () => {
+      return request(app)
+        .delete("/api/reviews/bananas")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+
+    it("status: 404, review_id not found", () => {
+      return request(app)
+        .delete("/api/reviews/999999")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Review Not Found");
+        });
+    });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
