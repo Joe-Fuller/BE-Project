@@ -706,6 +706,38 @@ describe("POST /api/reviews", () => {
   });
 });
 
+describe("POST /api/categories", () => {
+  describe("Functionality", () => {
+    it("status: 201, adds a new category and returns it", () => {
+      return request(app)
+        .post("/api/categories")
+        .send({
+          slug: "roguelike",
+          description: "The hardest board games you'll ever play",
+        })
+        .expect(201)
+        .then(({ body: { category } }) => {
+          expect(category).toEqual({
+            slug: "roguelike",
+            description: "The hardest board games you'll ever play",
+          });
+        });
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("status: 400, missing required fields on body", () => {
+      return request(app)
+        .post("/api/categories")
+        .send({})
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing Required Fields");
+        });
+    });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
