@@ -559,7 +559,7 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 });
 
-describe.only("POST /api/reviews", () => {
+describe("POST /api/reviews", () => {
   describe("Functionality", () => {
     it("status: 201, posts a new review and returns it", () => {
       return request(app)

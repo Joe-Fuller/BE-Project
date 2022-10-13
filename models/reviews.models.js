@@ -54,6 +54,40 @@ exports.insertReview = (body) => {
     return Promise.reject({ status: 400, msg: "Missing Required Fields" });
   }
 
+  const validCategories = [
+    "euro game",
+    "social deduction",
+    "dexterity",
+    "children's games",
+    "strategy",
+    "hidden-roles",
+    "push-your-luck",
+    "roll-and-write",
+    "deck-building",
+    "engine-building",
+  ];
+
+  if (!validCategories.includes(body.category)) {
+    return Promise.reject({ status: 400, msg: "Invalid Category" });
+  }
+
+  const validUsernames = [
+    "mallionaire",
+    "philippaclaire9",
+    "bainesface",
+    "dav3rid",
+    "tickle122",
+    "grumpy19",
+    "happyamy2016",
+    "cooljmessy",
+    "weegembump",
+    "jessjelly",
+  ];
+
+  if (!validUsernames.includes(body.owner)) {
+    return Promise.reject({ status: 400, msg: "Invalid Username" });
+  }
+
   return db
     .query(
       `
