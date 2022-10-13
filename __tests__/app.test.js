@@ -169,16 +169,6 @@ describe("PATCH /api/reviews/:review_id", () => {
           expect(msg).toBe("Bad Request");
         });
     });
-
-    it("status: 400, Bad Request when invalid inc_votes value", () => {
-      return request(app)
-        .patch("/api/reviews/1")
-        .send({ inc_votes: "cat" })
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).toBe("Bad Request");
-        });
-    });
   });
 });
 
@@ -461,7 +451,7 @@ describe("GET /api", () => {
   });
 });
 
-describe.only("GET /api/users/:username", () => {
+describe("GET /api/users/:username", () => {
   describe("Functionality", () => {
     it("status: 200, responds with the specified user object", () => {
       return request(app)
@@ -485,6 +475,85 @@ describe.only("GET /api/users/:username", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("User Not Found");
+        });
+    });
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  describe("Functionality", () => {
+    it("status: 200, updates the votes on specified comment and returns comment", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 10 })
+        .expect(200)
+        .then(({ body: { comment } }) => {
+          expect(comment).toEqual({
+            comment_id: 1,
+            body: "I loved this game too!",
+            votes: 26,
+            author: "bainesface",
+            review_id: 2,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    it("status: 200, ignores extra keys on body", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 10, something_else: "aaaahhh" })
+        .expect(200)
+        .then(({ body: { comment } }) => {
+          expect(comment).toEqual({
+            comment_id: 1,
+            body: "I loved this game too!",
+            votes: 26,
+            author: "bainesface",
+            review_id: 2,
+            created_at: expect.any(String),
+          });
+        });
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("status: 400, Bad Request when no inc_votes on body", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({})
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+
+    it("status: 400, Bad Request when invalid inc_votes value", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: "cat" })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+
+    it("status: 400, invalid comment_id", () => {
+      return request(app)
+        .patch("/api/comments/cat")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad Request");
+        });
+    });
+
+    it("status: 404, comment_id not found", () => {
+      return request(app)
+        .patch("/api/comments/99999")
+        .send({ inc_votes: 10 })
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Comment Not Found");
         });
     });
   });

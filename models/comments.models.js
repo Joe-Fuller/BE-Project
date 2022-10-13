@@ -85,3 +85,22 @@ exports.removeComment = (comment_id) => {
       return;
     });
 };
+
+exports.updateVotes = (comment_id, votes) => {
+  if (!votes) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  } else {
+    return db
+      .query(
+        `UPDATE comments SET votes=votes+$1 WHERE comment_id=$2 RETURNING *`,
+        [votes, comment_id]
+      )
+      .then(({ rows: [comment] }) => {
+        if (comment) {
+          return comment;
+        } else {
+          return Promise.reject({ status: 404, msg: "Comment Not Found" });
+        }
+      });
+  }
+};
