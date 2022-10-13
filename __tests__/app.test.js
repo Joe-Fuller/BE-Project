@@ -559,6 +559,77 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 });
 
+describe.only("POST /api/reviews", () => {
+  describe("Functionality", () => {
+    it("status: 201, posts a new review and returns it", () => {
+      return request(app)
+        .post("/api/reviews")
+        .send({
+          owner: "mallionaire",
+          title: "Blokus",
+          review_body: "it's GOOD!",
+          designer: "Bernard Tavitian",
+          category: "euro game",
+        })
+        .expect(201)
+        .then(({ body: { review } }) => {
+          expect(review).toEqual({
+            owner: "mallionaire",
+            title: "Blokus",
+            review_body: "it's GOOD!",
+            designer: "Bernard Tavitian",
+            category: "euro game",
+            review_id: 14,
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0,
+          });
+        });
+    });
+  });
+  describe("Error Handling", () => {
+    it("status: 400, missing required fields", () => {
+      return request(app)
+        .post("/api/reviews")
+        .send({})
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Missing Required Fields");
+        });
+    });
+    it("status: 400, invalid username", () => {
+      return request(app)
+        .post("/api/reviews")
+        .send({
+          owner: "joe",
+          title: "Blokus",
+          review_body: "it's GOOD!",
+          designer: "Bernard Tavitian",
+          category: "euro game",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid Username");
+        });
+    });
+    it("status: 400, invalid category", () => {
+      return request(app)
+        .post("/api/reviews")
+        .send({
+          owner: "mallionaire",
+          title: "Blokus",
+          review_body: "it's GOOD!",
+          designer: "Bernard Tavitian",
+          category: "fakecategory",
+        })
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Invalid Category");
+        });
+    });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
