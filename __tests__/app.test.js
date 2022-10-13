@@ -461,6 +461,35 @@ describe("GET /api", () => {
   });
 });
 
+describe.only("GET /api/users/:username", () => {
+  describe("Functionality", () => {
+    it("status: 200, responds with the specified user object", () => {
+      return request(app)
+        .get("/api/users/bainesface")
+        .expect(200)
+        .then(({ body: { user } }) => {
+          expect(user).toBeInstanceOf(Object);
+          expect(user).toEqual({
+            username: "bainesface",
+            name: "sarah",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+          });
+        });
+    });
+  });
+  describe("Error Handling", () => {
+    it("status: 404, Not Found", () => {
+      return request(app)
+        .get("/api/users/mrfakename")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("User Not Found");
+        });
+    });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
