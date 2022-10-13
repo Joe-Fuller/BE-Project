@@ -132,6 +132,8 @@ exports.selectReviews = (queries) => {
   const category = queries.category;
   const sort_by = queries.sort_by || "created_at";
   const order = queries.order || "desc";
+  const limit = queries.limit || 10;
+  const page = queries.p || 1;
 
   if (category && !validCategories.includes(category)) {
     return Promise.reject({ status: 404, msg: "Category Not Found" });
@@ -148,8 +150,18 @@ exports.selectReviews = (queries) => {
     });
   }
 
+  if (limit < 1) {
+    return Promise.reject({ status: 400, msg: "Limit must be positive" });
+  }
+
+  if (page < 1) {
+    return Promise.reject({ status: 400, msg: "p must be positive" });
+  }
+
+  const offset = limit * (page - 1);
+
   let queryString = `
-  SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count
+  SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count, COUNT(reviews) ::INT AS total_count
   FROM reviews 
   LEFT JOIN comments 
   ON reviews.review_id = comments.review_id
@@ -167,13 +179,14 @@ exports.selectReviews = (queries) => {
   queryString += ` 
   GROUP BY reviews.review_id 
   ORDER BY ${sort_by} ${order}
+  LIMIT ${limit} OFFSET ${offset}
   `;
 
   return db.query(queryString).then(({ rows: reviews }) => {
     if (reviews.length === 0) {
       return Promise.reject({
         status: 400,
-        msg: "No Reviews In That Category",
+        msg: "No Reviews Found",
       });
     }
     return reviews;

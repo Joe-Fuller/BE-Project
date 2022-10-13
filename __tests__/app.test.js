@@ -180,7 +180,7 @@ describe("GET /api/reviews", () => {
         .expect(200)
         .then(({ body: { reviews } }) => {
           expect(reviews).toBeInstanceOf(Array);
-          expect(reviews).toHaveLength(13);
+          expect(reviews).toHaveLength(10);
           reviews.forEach((review) => {
             expect(review).toEqual(
               expect.objectContaining({
@@ -194,6 +194,7 @@ describe("GET /api/reviews", () => {
                 designer: expect.any(String),
                 review_body: expect.any(String),
                 comment_count: expect.any(Number),
+                total_count: expect.any(Number),
               })
             );
           });
@@ -261,7 +262,7 @@ describe("GET /api/reviews", () => {
 
     it("accepts query 'p', which determines page number to start at (defaulting to 1)", () => {
       return request(app)
-        .get("/api/reviews?p=3")
+        .get("/api/reviews?p=2")
         .expect(200)
         .then(({ body: { reviews } }) => {
           expect(reviews).toHaveLength(3);
@@ -275,7 +276,7 @@ describe("GET /api/reviews", () => {
         .get("/api/reviews?category=children's games")
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).toBe("No Reviews In That Category");
+          expect(msg).toBe("No Reviews Found");
         });
     });
 
@@ -303,6 +304,24 @@ describe("GET /api/reviews", () => {
         .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Order must be 'asc' or 'desc'");
+        });
+    });
+
+    it("status: 400, rejects invalid limit", () => {
+      return request(app)
+        .get("/api/reviews?limit=-10")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Limit must be positive");
+        });
+    });
+
+    it("status: 400, rejects invalid p", () => {
+      return request(app)
+        .get("/api/reviews?p=-10")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("p must be positive");
         });
     });
   });
