@@ -7,7 +7,8 @@ const {
 
 exports.getCommentsByReviewId = (req, res, next) => {
   const review_id = req.params.review_id;
-  selectCommentsByReviewId(review_id)
+  const queries = req.query;
+  selectCommentsByReviewId(review_id, queries)
     .then((comments) => {
       res.status(200).send({ comments });
     })

@@ -1,7 +1,20 @@
 const db = require("../db/connection");
 const { selectReviewById } = require("./reviews.models");
 
-exports.selectCommentsByReviewId = (review_id) => {
+exports.selectCommentsByReviewId = (review_id, queries) => {
+  const limit = queries.limit || 10;
+  const page = queries.p || 1;
+
+  if (limit < 1) {
+    return Promise.reject({ status: 400, msg: "Limit must be positive" });
+  }
+
+  if (page < 1) {
+    return Promise.reject({ status: 400, msg: "p must be positive" });
+  }
+
+  const offset = limit * (page - 1);
+
   let promises = [selectReviewById(review_id)];
 
   promises.push(
@@ -13,8 +26,9 @@ exports.selectCommentsByReviewId = (review_id) => {
     JOIN comments
     ON reviews.review_id = comments.review_id
     WHERE comments.review_id = $1
-    ORDER BY created_at DESC`,
-        [review_id]
+    ORDER BY created_at DESC
+    LIMIT $2 OFFSET $3`,
+        [review_id, limit, offset]
       )
       .then(({ rows: comments }) => {
         return comments;

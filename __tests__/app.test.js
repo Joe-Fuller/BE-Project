@@ -369,6 +369,24 @@ describe("GET /api/reviews/:review_id/comments", () => {
           expect(comments).toBeSortedBy("created_at", { descending: true });
         });
     });
+
+    it("accepts query 'limit', which limits the number of responses (defaulting to 10)", () => {
+      return request(app)
+        .get("/api/reviews/2/comments?limit=5")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toHaveLength(3);
+        });
+    });
+
+    it("accepts query 'p', which determines page number to start at (defaulting to 1)", () => {
+      return request(app)
+        .get("/api/reviews/2/comments?limit=2&p=2")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).toHaveLength(1);
+        });
+    });
   });
 
   describe("Error Handling", () => {
@@ -387,6 +405,24 @@ describe("GET /api/reviews/:review_id/comments", () => {
         .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).toBe("Not Found");
+        });
+    });
+
+    it("status: 400, rejects invalid limit", () => {
+      return request(app)
+        .get("/api/reviews/2/comments?limit=-10")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Limit must be positive");
+        });
+    });
+
+    it("status: 400, rejects invalid p", () => {
+      return request(app)
+        .get("/api/reviews/2/comments?p=-10")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("p must be positive");
         });
     });
   });
