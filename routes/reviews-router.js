@@ -8,11 +8,11 @@ const {
   getReviewById,
   patchVotes,
   getReviews,
+  postReview,
 } = require("../controllers/reviews.controllers");
 
-reviewRouter.get("/", getReviews);
-reviewRouter.get("/:review_id", getReviewById);
-reviewRouter.patch("/:review_id", patchVotes);
+reviewRouter.route("/").get(getReviews).post(postReview);
+reviewRouter.route("/:review_id").get(getReviewById).patch(patchVotes);
 
 reviewRouter
   .route("/:review_id/comments")

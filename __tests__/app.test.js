@@ -580,9 +580,11 @@ describe.only("POST /api/reviews", () => {
             designer: "Bernard Tavitian",
             category: "euro game",
             review_id: 14,
+            review_img_url:
+              "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg",
             votes: 0,
             created_at: expect.any(String),
-            comment_count: 0,
+            //comment_count: 0,
           });
         });
     });

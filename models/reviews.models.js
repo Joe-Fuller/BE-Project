@@ -37,6 +37,38 @@ exports.updateVotes = (review_id, votes) => {
   }
 };
 
+exports.insertReview = (body) => {
+  if (!body) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  if (
+    !(
+      body.owner &&
+      body.title &&
+      body.review_body &&
+      body.designer &&
+      body.category
+    )
+  ) {
+    return Promise.reject({ status: 400, msg: "Missing Required Fields" });
+  }
+
+  return db
+    .query(
+      `
+  INSERT INTO reviews
+  (owner, title, review_body, designer, category)
+  VALUES
+  ($1, $2, $3, $4, $5)
+  RETURNING *`,
+      [body.owner, body.title, body.review_body, body.designer, body.category]
+    )
+    .then(({ rows: [review] }) => {
+      return review;
+    });
+};
+
 exports.selectReviews = (queries) => {
   const validCategories = [
     "euro game",
