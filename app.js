@@ -12,9 +12,12 @@ const {
   postCommentByReviewId,
   deleteComment,
 } = require("./controllers/comments.controllers");
+const { getApi } = require("./controllers/api.controllers");
 
 const app = express();
 app.use(express.json());
+
+app.get("/api", getApi);
 
 app.get("/api/categories", getCategories);
 
@@ -24,7 +27,6 @@ app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.patch("/api/reviews/:review_id", patchVotes);
-
 app.post("/api/reviews/:review_id/comments", postCommentByReviewId);
 
 app.delete("/api/comments/:comment_id", deleteComment);

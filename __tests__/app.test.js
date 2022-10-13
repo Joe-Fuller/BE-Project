@@ -449,6 +449,17 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+describe("GET /api", () => {
+  it("status: 200, returns JSON describing all endpoints of the api", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toBeInstanceOf(Object);
+      });
+  });
+});
+
 describe("Error Handling", () => {
   it("status: 404, Not Found", () => {
     return request(app)
