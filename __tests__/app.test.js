@@ -178,7 +178,9 @@ describe("GET /api/reviews", () => {
       return request(app)
         .get("/api/reviews")
         .expect(200)
-        .then(({ body: { reviews } }) => {
+        .then(({ body }) => {
+          expect(body.total_count).toBe(13);
+          const reviews = body.reviews;
           expect(reviews).toBeInstanceOf(Array);
           expect(reviews).toHaveLength(10);
           reviews.forEach((review) => {
@@ -194,7 +196,6 @@ describe("GET /api/reviews", () => {
                 designer: expect.any(String),
                 review_body: expect.any(String),
                 comment_count: expect.any(Number),
-                total_count: expect.any(Number),
               })
             );
           });

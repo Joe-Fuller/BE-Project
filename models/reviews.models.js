@@ -161,7 +161,7 @@ exports.selectReviews = (queries) => {
   const offset = limit * (page - 1);
 
   let queryString = `
-  SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count, COUNT(reviews) ::INT AS total_count
+  SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count
   FROM reviews 
   LEFT JOIN comments 
   ON reviews.review_id = comments.review_id
@@ -182,13 +182,29 @@ exports.selectReviews = (queries) => {
   LIMIT ${limit} OFFSET ${offset}
   `;
 
-  return db.query(queryString).then(({ rows: reviews }) => {
-    if (reviews.length === 0) {
-      return Promise.reject({
-        status: 400,
-        msg: "No Reviews Found",
-      });
-    }
-    return reviews;
+  const promises = [];
+
+  promises.push(
+    db.query(queryString).then(({ rows: reviews }) => {
+      if (reviews.length === 0) {
+        return Promise.reject({
+          status: 400,
+          msg: "No Reviews Found",
+        });
+      }
+      return reviews;
+    })
+  );
+
+  promises.push(
+    db
+      .query(`SELECT COUNT(*) ::INT FROM reviews`)
+      .then(({ rows: [{ count }] }) => {
+        return count;
+      })
+  );
+
+  return Promise.all(promises).then((res) => {
+    return { reviews: res[0], total_count: res[1] };
   });
 };
