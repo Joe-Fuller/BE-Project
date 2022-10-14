@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const { selectCategories } = require("./categories.models");
+const { selectUsers } = require("./users.models");
 
 exports.selectReviewById = (review_id) => {
   return db
@@ -55,52 +56,44 @@ exports.insertReview = (body) => {
     return Promise.reject({ status: 400, msg: "Missing Required Fields" });
   }
 
-  const validCategories = [
-    "euro game",
-    "social deduction",
-    "dexterity",
-    "children's games",
-    "strategy",
-    "hidden-roles",
-    "push-your-luck",
-    "roll-and-write",
-    "deck-building",
-    "engine-building",
-  ];
+  return selectCategories()
+    .then((categories) => {
+      const validCategories = categories.map((cat) => {
+        return cat.slug;
+      });
 
-  if (!validCategories.includes(body.category)) {
-    return Promise.reject({ status: 400, msg: "Invalid Category" });
-  }
+      if (!validCategories.includes(body.category)) {
+        return Promise.reject({ status: 400, msg: "Invalid Category" });
+      }
+      return selectUsers();
+    })
+    .then((users) => {
+      const validUsernames = users.map((user) => user.username);
 
-  const validUsernames = [
-    "mallionaire",
-    "philippaclaire9",
-    "bainesface",
-    "dav3rid",
-    "tickle122",
-    "grumpy19",
-    "happyamy2016",
-    "cooljmessy",
-    "weegembump",
-    "jessjelly",
-  ];
-
-  if (!validUsernames.includes(body.owner)) {
-    return Promise.reject({ status: 400, msg: "Invalid Username" });
-  }
-
-  return db
-    .query(
-      `
-  INSERT INTO reviews
-  (owner, title, review_body, designer, category)
-  VALUES
-  ($1, $2, $3, $4, $5)
-  RETURNING *`,
-      [body.owner, body.title, body.review_body, body.designer, body.category]
-    )
-    .then(({ rows: [review] }) => {
-      return review;
+      if (!validUsernames.includes(body.owner)) {
+        return Promise.reject({ status: 400, msg: "Invalid Username" });
+      }
+    })
+    .then(() => {
+      return db
+        .query(
+          `
+          INSERT INTO reviews
+          (owner, title, review_body, designer, category)
+          VALUES
+          ($1, $2, $3, $4, $5)
+          RETURNING *`,
+          [
+            body.owner,
+            body.title,
+            body.review_body,
+            body.designer,
+            body.category,
+          ]
+        )
+        .then(({ rows: [review] }) => {
+          return review;
+        });
     });
 };
 
