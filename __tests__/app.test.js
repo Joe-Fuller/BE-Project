@@ -100,7 +100,7 @@ describe("GET", () => {
     });
   });
 
-  describe("/api/reviews", () => {
+  describe.only("/api/reviews", () => {
     describe("Functionality", () => {
       it("status: 200, responds with an array of reviews", () => {
         return request(app)

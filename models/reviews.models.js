@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { selectCategories } = require("./categories.models");
 
 exports.selectReviewById = (review_id) => {
   return db
@@ -104,18 +105,11 @@ exports.insertReview = (body) => {
 };
 
 exports.selectReviews = (queries) => {
-  const validCategories = [
-    "euro game",
-    "social deduction",
-    "dexterity",
-    "children's games",
-    "strategy",
-    "hidden-roles",
-    "push-your-luck",
-    "roll-and-write",
-    "deck-building",
-    "engine-building",
-  ];
+  const category = queries.category;
+  const sort_by = queries.sort_by || "created_at";
+  const order = queries.order || "desc";
+  const limit = queries.limit || 10;
+  const page = queries.p || 1;
 
   const validSortBys = [
     "review_id",
@@ -128,16 +122,6 @@ exports.selectReviews = (queries) => {
     "created_at",
     "votes",
   ];
-
-  const category = queries.category;
-  const sort_by = queries.sort_by || "created_at";
-  const order = queries.order || "desc";
-  const limit = queries.limit || 10;
-  const page = queries.p || 1;
-
-  if (category && !validCategories.includes(category)) {
-    return Promise.reject({ status: 404, msg: "Category Not Found" });
-  }
 
   if (!validSortBys.includes(sort_by)) {
     return Promise.reject({ status: 404, msg: "Column Not Found" });
@@ -158,55 +142,64 @@ exports.selectReviews = (queries) => {
     return Promise.reject({ status: 400, msg: "p must be positive" });
   }
 
-  const offset = limit * (page - 1);
-
-  let queryString = `
-  SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count
-  FROM reviews 
-  LEFT JOIN comments 
-  ON reviews.review_id = comments.review_id
-  `;
-
-  if (category) {
-    queryString += `WHERE reviews.category = `;
-    if (category === "children's games") {
-      queryString += `'children''s games'`;
-    } else {
-      queryString += `'${category}'`;
-    }
-  }
-
-  queryString += ` 
-  GROUP BY reviews.review_id 
-  ORDER BY ${sort_by} ${order}
-  LIMIT ${limit} OFFSET ${offset}
-  `;
-
-  const promises = [];
-
-  promises.push(
-    db.query(queryString).then(({ rows: reviews }) => {
-      if (reviews.length === 0) {
-        return Promise.reject({
-          status: 400,
-          msg: "No Reviews Found",
-        });
+  return selectCategories()
+    .then((categories) => {
+      const validCategories = categories.map((cat) => cat.slug);
+      if (category && !validCategories.includes(category)) {
+        return Promise.reject({ status: 404, msg: "Category Not Found" });
       }
-      return reviews;
     })
-  );
+    .then(() => {
+      const offset = limit * (page - 1);
 
-  promises.push(
-    db
-      .query(`SELECT COUNT(*) ::INT FROM reviews`)
-      .then(({ rows: [{ count }] }) => {
-        return count;
-      })
-  );
+      let queryString = `
+      SELECT reviews.*, COUNT(comments.review_id) ::INT AS comment_count
+      FROM reviews 
+      LEFT JOIN comments 
+      ON reviews.review_id = comments.review_id
+      `;
 
-  return Promise.all(promises).then((res) => {
-    return { reviews: res[0], total_count: res[1] };
-  });
+      if (category) {
+        queryString += `WHERE reviews.category = `;
+        if (category === "children's games") {
+          queryString += `'children''s games'`;
+        } else {
+          queryString += `'${category}'`;
+        }
+      }
+
+      queryString += ` 
+      GROUP BY reviews.review_id 
+      ORDER BY ${sort_by} ${order}
+      LIMIT ${limit} OFFSET ${offset}
+      `;
+
+      const promises = [];
+
+      promises.push(
+        db.query(queryString).then(({ rows: reviews }) => {
+          if (reviews.length === 0) {
+            return Promise.reject({
+              status: 400,
+              msg: "No Reviews Found",
+            });
+          }
+          return reviews;
+        })
+      );
+
+      promises.push(
+        db
+          .query(`SELECT COUNT(*) ::INT FROM reviews`)
+          .then(({ rows: [{ count }] }) => {
+            return count;
+          })
+      );
+
+      return Promise.all(promises).then((res) => {
+        return { reviews: res[0], total_count: res[1] };
+      });
+    });
 };
 
 exports.removeReview = (review_id) => {
