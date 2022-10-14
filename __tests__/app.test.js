@@ -300,7 +300,7 @@ describe("GET", () => {
           .get("/api/reviews/99999")
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Not Found");
+            expect(msg).toBe("Review Not Found");
           });
       });
     });
@@ -382,7 +382,7 @@ describe("GET", () => {
           .get("/api/reviews/9999/comments")
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Not Found");
+            expect(msg).toBe("Review Not Found");
           });
       });
 
@@ -563,7 +563,7 @@ describe("POST", () => {
           .send({ body: "waa", username: "wahoo" })
           .expect(404)
           .then(({ body: { msg } }) => {
-            expect(msg).toBe("Not Found");
+            expect(msg).toBe("Review Not Found");
           });
       });
     });
@@ -750,7 +750,7 @@ describe("DELETE", () => {
   describe("/api/reviews/:review_id", () => {
     describe("Functionality", () => {
       it("status: 204", () => {
-        return request(app).delete("/api/reviews/1").expect(204);
+        return request(app).delete("/api/reviews/2").expect(204);
       });
     });
 

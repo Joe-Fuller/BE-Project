@@ -1,5 +1,8 @@
 const db = require("../db/connection");
 const { selectCategories } = require("./categories.models");
+
+const commentFunctions = require("./comments.models");
+
 const { selectUsers } = require("./users.models");
 
 exports.selectReviewById = (review_id) => {
@@ -19,7 +22,7 @@ exports.selectReviewById = (review_id) => {
       if (review) {
         return review;
       } else {
-        return Promise.reject({ status: 404, msg: "Not Found" });
+        return Promise.reject({ status: 404, msg: "Review Not Found" });
       }
     });
 };
@@ -200,12 +203,25 @@ exports.removeReview = (review_id) => {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
 
-  return db
-    .query(`DELETE FROM reviews WHERE review_id = $1`, [review_id])
-    .then((response) => {
-      if (response.rowCount === 0) {
-        return Promise.reject({ status: 404, msg: "Review Not Found" });
-      }
-      return;
+  return commentFunctions
+    .selectCommentsByReviewId(review_id, {})
+    .then((comments) => {
+      const commentIds = comments.map((comment) => {
+        return comment.comment_id;
+      });
+      const deleteCommentPromises = commentIds.map((comment_id) => {
+        return commentFunctions.removeComment(comment_id);
+      });
+      return Promise.all(deleteCommentPromises);
+    })
+    .then(() => {
+      return db
+        .query(`DELETE FROM reviews WHERE review_id = $1`, [review_id])
+        .then((response) => {
+          if (response.rowCount === 0) {
+            return Promise.reject({ status: 404, msg: "Review Not Found" });
+          }
+          return;
+        });
     });
 };
