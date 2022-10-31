@@ -13,8 +13,10 @@ const {
   deleteComment,
 } = require("./controllers/comments.controllers");
 const { getApi } = require("./controllers/api.controllers");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/api", getApi);
