@@ -1,37 +1,12 @@
 const express = require("express");
-
-const { getCategories } = require("./controllers/categories.controllers");
-const { getUsers } = require("./controllers/users.controllers");
-const {
-  getReviewById,
-  patchVotes,
-  getReviews,
-} = require("./controllers/reviews.controllers");
-const {
-  getCommentsByReviewId,
-  postCommentByReviewId,
-  deleteComment,
-} = require("./controllers/comments.controllers");
-const { getApi } = require("./controllers/api.controllers");
+const apiRouter = require("./routes/api-router");
 const cors = require("cors");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/api", getApi);
-
-app.get("/api/categories", getCategories);
-
-app.get("/api/users", getUsers);
-
-app.get("/api/reviews", getReviews);
-app.get("/api/reviews/:review_id", getReviewById);
-app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
-app.patch("/api/reviews/:review_id", patchVotes);
-app.post("/api/reviews/:review_id/comments", postCommentByReviewId);
-
-app.delete("/api/comments/:comment_id", deleteComment);
+app.use("/api", apiRouter);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });

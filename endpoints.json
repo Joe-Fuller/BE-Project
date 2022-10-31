@@ -4,7 +4,6 @@
   },
   "GET /api/categories": {
     "description": "serves an array of all categories",
-    "queries": [],
     "exampleResponse": {
       "categories": [
         {
@@ -16,7 +15,6 @@
   },
   "GET /api/users": {
     "description": "serves an array of all users",
-    "queries": [],
     "exampleResponse": {
       "users": [
         {
@@ -25,6 +23,16 @@
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
       ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves up an object containing a specified user's details",
+    "exampleResponse": {
+      "user": {
+        "username": "tickle122",
+        "name": "Tom Tickle",
+        "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
+      }
     }
   },
   "GET /api/reviews": {
@@ -52,13 +60,16 @@
     "queries": [],
     "exampleResponse": {
       "review": {
-        "title": "One Night Ultimate Werewolf",
-        "designer": "Akihisa Okui",
-        "owner": "happyamy2016",
-        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        "category": "hidden-roles",
-        "created_at": 1610964101251,
-        "votes": 5
+        "review_id": 2,
+        "title": "JengARRGGGH!",
+        "category": "dexterity",
+        "designer": "Leslie Scott",
+        "owner": "grumpy19",
+        "review_body": "Few games are equiped to fill a player with such a defined sense of mild-peril, but a friendly game of Jenga will turn the mustn't-make-it-fall anxiety all the way up to 11! Fiddly fun for all the family, this game needs little explaination. Whether you're a player who chooses to play it safe, or one who lives life on the edge, eventually the removal of blocks will destabilise the tower and all your Jenga dreams come tumbling down.",
+        "review_img_url": "https://images.pexels.com/photos/4009761/pexels-photo-4009761.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
+        "created_at": "2021-01-18T10:01:41.251Z",
+        "votes": 5,
+        "comment_count": "3"
       }
     }
   },
@@ -78,9 +89,72 @@
       ]
     }
   },
+  "POST /api/categories": {
+    "description": "posts a new category and serves an object containing that category",
+    "examplePost": {
+      "slug": "roguelike",
+      "description": "The hardest board games you'll ever play"
+    },
+    "exampleResponse": {
+      "slug": "roguelike",
+      "description": "The hardest board games you'll ever play"
+    }
+  },
+  "POST /api/reviews": {
+    "description": "posts a new review and serves an object containing that review",
+    "examplePost": {
+      "owner": "mallionaire",
+      "title": "Blokus",
+      "review_body": "it's GOOD!",
+      "designer": "Bernard Tavitian",
+      "category": "euro game"
+    },
+    "exampleResponse": {
+      "owner": "mallionaire",
+      "title": "Blokus",
+      "review_body": "it's GOOD!",
+      "designer": "Bernard Tavitian",
+      "category": "euro game",
+      "review_id": 14,
+      "review_img_url": "https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg",
+      "votes": 0,
+      "created_at": "2022-10-13T09:04:19.409Z"
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "posts a comment to a specified review and serves an object containing that comment",
+    "examplePost": {
+      "username": "bainesface",
+      "body": "it's not geology but it rocks"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 7,
+        "body": "it's not geology but it rocks",
+        "review_id": 2,
+        "author": "bainesface",
+        "votes": 0,
+        "created_at": "2022-10-13T09:04:19.409Z"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes on a specified comment and serves an object containing the updated comment",
+    "examplePatch": {
+      "inc_votes": 10
+    },
+    "exampleResponse": {
+      "comment_id": 1,
+      "body": "I loved this game too!",
+      "votes": 26,
+      "author": "bainesface",
+      "review_id": 2,
+      "created_at": "2022-10-13T09:04:19.409Z"
+    }
+  },
   "PATCH /api/reviews/:review_id": {
     "description": "updates the votes on a specified review and serves an object containing the updated review",
-    "queries": [],
+    "examplePatch": { "inc_votes": 10 },
     "exampleResponse": {
       "review": {
         "review_id": 1,
@@ -95,23 +169,10 @@
       }
     }
   },
-  "POST /api/reviews/:review_id/comments": {
-    "description": "posts a comment to a specified review and serves an object containing that comment",
-    "queries": [],
-    "exampleResponse": {
-      "comment": {
-        "comment_id": 7,
-        "body": "it's not geology but it rocks",
-        "review_id": 2,
-        "author": "bainesface",
-        "votes": 0,
-        "created_at": "2022-10-13T09:04:19.409Z"
-      }
-    }
-  },
   "DELETE /api/comments/:comment_id": {
-    "description": "deletes a comment specified by :comment_id",
-    "queries": [],
-    "exampleResponse": {}
+    "description": "deletes a comment specified by :comment_id"
+  },
+  "DELETE /api/reviews/:review_id": {
+    "description": "deletes a review specified by :review_id"
   }
 }

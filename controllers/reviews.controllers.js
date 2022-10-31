@@ -2,6 +2,8 @@ const {
   selectReviewById,
   updateVotes,
   selectReviews,
+  insertReview,
+  removeReview,
 } = require("../models/reviews.models");
 
 exports.getReviewById = (req, res, next) => {
@@ -30,8 +32,30 @@ exports.patchVotes = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
   const queries = req.query;
   selectReviews(queries)
-    .then((reviews) => {
-      res.status(200).send({ reviews });
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postReview = (req, res, next) => {
+  const body = req.body;
+
+  insertReview(body)
+    .then((review) => {
+      res.status(201).send({ review });
+    })
+    .catch((err) => next(err));
+};
+
+exports.deleteReview = (req, res, next) => {
+  const review_id = req.params.review_id;
+
+  removeReview(review_id)
+    .then(() => {
+      res.status(204).send({});
     })
     .catch((err) => {
       next(err);
