@@ -33,6 +33,7 @@ exports.getReviews = (req, res, next) => {
   const queries = req.query;
   selectReviews(queries)
     .then((response) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(200).send(response);
     })
     .catch((err) => {
