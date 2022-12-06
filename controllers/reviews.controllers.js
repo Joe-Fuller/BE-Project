@@ -11,6 +11,7 @@ exports.getReviewById = (req, res, next) => {
 
   selectReviewById(review_id)
     .then((review) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(200).send({ review });
     })
     .catch((err) => {
@@ -24,6 +25,7 @@ exports.patchVotes = (req, res, next) => {
 
   updateVotes(review_id, votes)
     .then((review) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(200).send({ review });
     })
     .catch((err) => next(err));
@@ -46,6 +48,7 @@ exports.postReview = (req, res, next) => {
 
   insertReview(body)
     .then((review) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(201).send({ review });
     })
     .catch((err) => next(err));
@@ -56,6 +59,7 @@ exports.deleteReview = (req, res, next) => {
 
   removeReview(review_id)
     .then(() => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(204).send({});
     })
     .catch((err) => {

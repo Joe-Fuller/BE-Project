@@ -10,6 +10,7 @@ exports.getCommentsByReviewId = (req, res, next) => {
   const queries = req.query;
   selectCommentsByReviewId(review_id, queries)
     .then((comments) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(200).send({ comments });
     })
     .catch((err) => {
@@ -23,6 +24,7 @@ exports.postCommentByReviewId = (req, res, next) => {
   const author = req.body.username;
   insertCommentByReviewId(body, author, review_id)
     .then((comment) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(201).send({ comment });
     })
     .catch((err) => {
@@ -35,6 +37,7 @@ exports.deleteComment = (req, res, next) => {
 
   removeComment(comment_id)
     .then(() => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(204).send({});
     })
     .catch((err) => {
@@ -48,6 +51,7 @@ exports.patchVotes = (req, res, next) => {
 
   updateVotes(comment_id, votes)
     .then((comment) => {
+      res.set("Access-Control-Allow-Origin", "*");
       res.status(200).send({ comment });
     })
     .catch((err) => next(err));
